@@ -1,0 +1,5 @@
+{
+  "name": "flow-map",
+  "version": "0.1.0",
+  "description": "Map a feature's whole flow as a living artifact: a state graph with built and not-built steps, questions pinned to the step they decide, test scenarios that cover every branch, and a change log. Claude creates it, updates it after every decision or deploy, and reads it back."
+}

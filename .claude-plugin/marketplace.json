@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "flow-map",
+  "description": "Local marketplace for the flow-map plugin.",
+  "owner": { "name": "btx1312" },
+  "plugins": [
+    {
+      "name": "flow-map",
+      "description": "Living flow maps: state graph, open questions, test scenarios and change log as one artifact.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
