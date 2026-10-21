@@ -14,11 +14,11 @@ Claude creates the map, updates it after every decision, code change, review or 
 In Claude Code:
 
 ```
-/plugin marketplace add btx1312/flow-map
+/plugin marketplace add bachtx1312/claude-flow-map
 /plugin install flow-map@flow-map
 ```
 
-If the repository is private, you need read access to it, and `git clone git@github.com:btx1312/flow-map.git` must work on your machine. For background auto-updates, also set `GITHUB_TOKEN` (or `GH_TOKEN`) to a token that can read the repo.
+If the repository is private, you need read access to it, and `git clone git@github.com:bachtx1312/claude-flow-map.git` must work on your machine. For background auto-updates, also set `GITHUB_TOKEN` (or `GH_TOKEN`) to a token that can read the repo.
 
 To update by hand: `/plugin marketplace update flow-map`.
 
