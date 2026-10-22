@@ -15,7 +15,7 @@
   "legend_covered": "Đã chốt hết câu hỏi", "legend_always": "luôn đi tiếp", "legend_cond": "có điều kiện", "legend_plan": "nhánh chưa có", "legend_reviewed": "đã review code",
   "find_ph": "Tìm: N4, A1", "find_label": "Tìm câu hỏi hoặc bước theo mã",
   "find_none": "Không tìm thấy {code}", "find_general": "{code} là câu hỏi chung", "find_at": "{code} ở {where}",
-  "view_label": "Cách xem", "view_map": "Toàn luồng", "view_step": "Từng bước", "fade": "Làm mờ phần đã có",
+  "view_label": "Cách xem", "view_map": "Toàn luồng", "view_step": "Từng bước", "fade": "Làm mờ phần đã có", "full": "Toàn màn hình",
   "zoom_label": "Thu phóng", "zoom_in": "Phóng to", "zoom_out": "Thu nhỏ", "zoom_reset": "Cỡ thật", "zoom_fit": "Vừa khung", "zoom_hint": "Kéo để di chuyển; giữ Ctrl hoặc ⌘ và cuộn để phóng to, thu nhỏ",
   "scen_title": "Kịch bản kiểm",
   "scen_sub": "Mỗi kịch bản là một đường đi qua các nhánh. Bấm một kịch bản để tô đường đó trên đồ thị. Trạng thái tự tính từ các bước trên đường: còn bước chưa có thì chưa kiểm được.",

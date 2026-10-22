@@ -711,5 +711,18 @@
   $('modeMap').addEventListener('click', () => setMode('map'));
   const toggle = $('fadeBuilt');
   toggle.addEventListener('click', () => { const on = toggle.getAttribute('aria-pressed') !== 'true'; toggle.setAttribute('aria-pressed', String(on)); fadeBuilt(on); });
+  // Full screen uses the browser API where allowed (an artifact iframe may block it); the .full class alone still fills the viewport.
+  const graphSec = $('graphSection'), fullBtn = $('fullScreen');
+  const isFull = () => graphSec.classList.contains('full');
+  fullBtn.title = S.full;
+  function setFull(on) {
+    graphSec.classList.toggle('full', on);
+    fullBtn.setAttribute('aria-pressed', String(on));
+    if (on) graphSec.requestFullscreen?.().catch(() => {});
+    else if (document.fullscreenElement) document.exitFullscreen();
+  }
+  fullBtn.addEventListener('click', () => setFull(!isFull()));
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && isFull()) setFull(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isFull()) setFull(false); });
   showPage(location.hash === '#changelog' ? 'log' : 'flow');
 })();

@@ -19,7 +19,7 @@
     legend_covered: 'All questions decided', legend_always: 'always goes on', legend_cond: 'conditional', legend_plan: 'branch not built', legend_reviewed: 'code reviewed',
     find_ph: 'Find: N4, A1', find_label: 'Find a step or question by its code',
     find_none: 'No {code}', find_general: '{code} is a general question', find_at: '{code} is at {where}',
-    view_label: 'View', view_map: 'Whole flow', view_step: 'Step by step', fade: 'Fade what is built',
+    view_label: 'View', view_map: 'Whole flow', view_step: 'Step by step', fade: 'Fade what is built', full: 'Full screen',
     zoom_label: 'Zoom', zoom_in: 'Zoom in', zoom_out: 'Zoom out', zoom_reset: 'Actual size', zoom_fit: 'Fit', zoom_hint: 'Drag to move; Ctrl or ⌘ and scroll to zoom',
     scen_title: 'Test scenarios',
     scen_sub: 'Each scenario is a path through the branches. Select one to highlight it on the graph. Its state comes from the steps on its path: a path through a step that is not built cannot be checked yet.',
