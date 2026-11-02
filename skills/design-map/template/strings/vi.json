@@ -1,6 +1,6 @@
 {
   "status_built": "ĐÃ CÓ", "status_partial": "MỘT PHẦN", "status_planned": "CHƯA CÓ", "status_mock": "GIẢ LẬP",
-  "page_nav": "Trang", "page_design": "Thiết kế", "page_log": "Nhật ký thay đổi",
+  "page_nav": "Trang", "page_design": "Thiết kế", "page_log": "Nhật ký thay đổi", "lang_label": "Ngôn ngữ",
   "fact_screens": "**{n}** màn hình, **{chosen}** đã chốt thiết kế",
   "fact_q": "**{d}** / **{n}** câu hỏi đã chốt",
   "fact_parts": "**{built}** / **{n}** phần UI đã có",

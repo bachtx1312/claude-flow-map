@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { FlowCore, loadFlow, loadPack } from '../skills/flow-map/template/flow.mjs';
+import { FlowCore, I18n, loadFlow, loadPack, loadPacks, checkLangs, untranslated } from '../skills/flow-map/template/flow.mjs';
 
 const T = path.join(path.dirname(fileURLToPath(import.meta.url)), '../skills/flow-map/template');
 const example = () => loadFlow(path.join(T, 'flow.example.js'));
@@ -83,4 +83,44 @@ test('a removed step keeps its old change-log lines valid, and its code cannot b
   assert.deepEqual([...FlowCore.check(flow).errors], []);
   flow.retired = ['N7'];
   assert.ok(FlowCore.check(flow).errors.some((e) => e.includes('retired code N7 is still used')));
+});
+
+test('a translation is looked up by its source text; ids, codes, code paths and edge ends stay as written', () => {
+  const flow = example();
+  const answer = flow.questions.R1.decided;
+  flow.translations = { vi: { 'Check the order can be refunded': 'Kiểm tra đơn có được hoàn không', Nothing: 'Không có gì', yes: 'có', [answer]: 'Bản dịch câu trả lời' } };
+  const vi = I18n.localize(flow, 'vi');
+  const n = vi.nodes.find((x) => x.id === 'check_order');
+  assert.equal(n.title, 'Kiểm tra đơn có được hoàn không');
+  assert.equal(n.code, 'N1');
+  assert.equal(n.where, flow.nodes.find((x) => x.id === 'check_order').where);
+  assert.ok(n.writes.includes('Không có gì'));
+  const i = flow.edges.findIndex((e) => e[2] === 'yes');
+  assert.deepEqual(vi.edges[i].slice(0, 3), [flow.edges[i][0], flow.edges[i][1], 'có']);
+  assert.deepEqual(Object.keys(vi.questions), Object.keys(flow.questions), 'one question, one id, in every language');
+  assert.equal(vi.questions.R1.decided, 'Bản dịch câu trả lời');
+  assert.equal(vi.questions.R2.q, flow.questions.R2.q, 'a text with no translation shows in the source language');
+  assert.equal(I18n.localize(flow, 'en'), flow);
+});
+
+test('the check names texts not translated and translations whose source was reworded; translations lists what is left', () => {
+  const flow = example();
+  flow.translations = { vi: { 'Old wording': 'Câu cũ', Nothing: 'Không có gì' } };
+  const { warnings } = checkLangs(flow, loadPacks(flow), FlowCore.check);
+  assert.ok(warnings.some((w) => /translations\.vi: \d+ texts are not translated/.test(w)));
+  assert.ok(warnings.some((w) => w.includes('"Old wording"')));
+  const left = JSON.parse(untranslated(flow, 'vi'));
+  assert.ok('Check the order can be refunded' in left);
+  assert.ok(!('Nothing' in left) && !('N1' in left) && !('check_order' in left) && !('built' in left));
+});
+
+test('a build with translations carries the labels of every language', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flow-map-')), f = path.join(dir, 'flow.data.js');
+  const flow = example();
+  flow.translations = { vi: {} };
+  fs.writeFileSync(f, `window.FLOW = ${JSON.stringify(flow)};\n`);
+  execFileSync(process.execPath, [path.join(T, 'flow.mjs'), 'build', f, path.join(dir, 'out')], { stdio: 'pipe' });
+  const html = fs.readFileSync(path.join(dir, 'out', 'index.html'), 'utf8');
+  assert.match(html, /window\.FLOW_STRINGS = \{"en":null,"vi":\{"kind_ai"/);
+  assert.ok(html.includes('I18n.boot(window.FLOW, drawFlow'));
 });

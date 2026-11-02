@@ -5,7 +5,7 @@
   const STRINGS = {
     kind_ai: 'AI', kind_code: 'CODE', kind_pause: 'WAIT', kind_step: 'CHECK',
     status_built: 'BUILT', status_partial: 'PARTIAL', status_planned: 'NOT BUILT', status_mock: 'MOCKED',
-    page_nav: 'Pages', page_flow: 'Flow', page_log: 'Change log',
+    page_nav: 'Pages', page_flow: 'Flow', page_log: 'Change log', lang_label: 'Language',
     fact_steps: '**{n}** steps: **{built}** built, **{partial}** partial, **{planned}** not built, **{mock}** mocked',
     fact_scen: '**{n}** test scenarios',
     fact_q: '**{d}** / **{n}** questions decided',

@@ -4,7 +4,7 @@
   // English is the base language; a pack in strings/<lang>.json or DESIGN.strings overrides any key.
   const STRINGS = {
     status_built: 'BUILT', status_partial: 'PARTIAL', status_planned: 'NOT BUILT', status_mock: 'MOCKED',
-    page_nav: 'Pages', page_design: 'Design', page_log: 'Change log',
+    page_nav: 'Pages', page_design: 'Design', page_log: 'Change log', lang_label: 'Language',
     fact_screens: '**{n}** screens, **{chosen}** with a chosen design',
     fact_q: '**{d}** / **{n}** questions decided',
     fact_parts: '**{built}** / **{n}** UI parts built',

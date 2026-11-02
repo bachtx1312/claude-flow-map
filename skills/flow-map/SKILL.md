@@ -20,6 +20,7 @@ The template sits in this skill's base directory, under `template/`:
 | `core.js` | Counting, scenario states, checks and English labels, shared by the page and the CLI. |
 | `render.js`, `page.html` | The page: ELK layout, inspector, step view, scenarios, questions, change log. Change the design here, never per flow. |
 | `strings/<lang>.json` | Label packs for languages other than English (`vi` ships). |
+| `i18n.js` | Content translations and the page's language switch, shared with design-map. |
 
 In the project, keep the data under version control and the build output out of it:
 
@@ -34,6 +35,7 @@ Commands, where `T` is the template directory:
 node $T/flow.mjs check   docs/flows/<slug>/flow.data.js                # errors exit 1; warnings list gaps
 node $T/flow.mjs summary docs/flows/<slug>/flow.data.js                # open questions, unbuilt steps, scenarios, last change
 node $T/flow.mjs build   docs/flows/<slug>/flow.data.js docs/flows/<slug>/.build
+node $T/flow.mjs translations docs/flows/<slug>/flow.data.js en           # texts en has no translation for, as JSON to fill in
 ```
 
 `build` writes `index.html` (to publish), `flow.data.js` (published beside it) and `preview.html` (to open locally), and prints the publish call.
@@ -48,7 +50,8 @@ Fields marked *rich* accept `**bold**`, `` `code` `` and `[label](https://…)`.
 |---|---|
 | `title`, `eyebrow`, `lead` (rich), `context` (rich) | The page name (kept stable across republishes), the line above it, the intro, and a line under the graph heading saying where the flow happens |
 | `url` | The artifact link, filled in after the first publish |
-| `lang`, `strings` | The label language and one-off label overrides (see Languages) |
+| `lang`, `strings` | The language the content is written in (also the label language), and one-off label overrides (see Languages) |
+| `translations` | Optional, to show the content in more languages: `{"<lang>": {"<source text>": "<translation>"}}` (see Languages) |
 | `owner` | Who answers the questions, shown as "For {owner} to decide" |
 | `asOf` | The date the graph matched the code |
 | `start` | The step selected when the page opens |
@@ -140,6 +143,7 @@ Change the data, add one change-log line for the event, then run `check`, `build
 Rules:
 - Never delete a decided question, and never renumber or reuse a code.
 - Write the change log newest first, one item per event, in the team's language.
+- With `translations`, every text you add or reword needs its translation in the same change: run `translations <lang>` for the list.
 - Before you edit, check whether someone else may have published since your last read (another session, a teammate). If so, read the published `flow.data.js` first and merge your change into it.
 
 ## C. Read a map
@@ -160,8 +164,17 @@ Answer with codes. For example: "N4 is partial; B1, B2 and B9 are open; S4 waits
   3. Set `lang` in the data.
 
   The CLI merges three sources in order: the bundled pack, then the project pack one folder up, then the pack beside the data file. Each later one overrides the earlier ones, so a project pack may also override only a few labels of a bundled language.
-- **To change a few labels for one flow:** put them in `FLOW.strings`.
-- The content (titles, questions, notes) is written in whatever language the team reads. Labels and content are separate.
+- **To change a few labels for one flow:** put them in `FLOW.strings`. They apply to the source language only.
+
+### Content in several languages
+
+The content (titles, questions, notes, the change log) is written once, in `lang`. To show it in other languages too:
+
+- **Add a translation table per language**, from each source text to its translation: `"translations": {"en": {"Kiểm tra đơn hàng": "Check the order"}}`. The page then shows a language switch, and each viewer's choice is remembered in their browser. Each language also needs a label pack; `check` warns when one is missing.
+- **The key is the source text itself.** A question keeps one id and one answer in every language, and only its words are translated. A text used twice is translated once. Keep the rich markup (`**bold**`, `` `code` ``, links) in the translation.
+- **Not translated:** ids, codes, dates, links, `where`, `screen` and `owner`. A text with no translation shows in the source language.
+- **To fill a table:** `translations <data> <lang>` prints what is left as `{"<source text>": ""}`. Fill in the values and merge them into `translations.<lang>`.
+- **Rewording a source text orphans its translation.** `check` warns about texts not translated and about entries that match no text. Fix both in the same change: move the translation to the new wording.
 
 ## Rules
 

@@ -269,6 +269,7 @@ section.full .canvas-scroll { height: 100%; }
 .qgroup-head button:focus-visible { outline: 3px solid var(--mark); outline-offset: 1px; }
 .qgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 8px; }
 #qFilter, .pagenav { justify-self: start; }
+.navrow { display: flex; flex-wrap: wrap; gap: 10px; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 620px; }
 th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
@@ -306,9 +307,12 @@ td:first-child { font-weight: 600; color: var(--ink); }
     <h1 id="title"></h1>
     <p class="lead" id="lead"></p>
     <div class="facts" id="facts"></div>
-    <div class="seg pagenav" role="group" data-s-aria="page_nav">
-      <button type="button" data-page="flow" aria-pressed="true" data-s="page_flow"></button>
-      <button type="button" data-page="log" aria-pressed="false" data-s="page_log"></button>
+    <div class="navrow">
+      <div class="seg pagenav" role="group" data-s-aria="page_nav">
+        <button type="button" data-page="flow" aria-pressed="true" data-s="page_flow"></button>
+        <button type="button" data-page="log" aria-pressed="false" data-s="page_log"></button>
+      </div>
+      <div class="seg" role="group" id="langNav" data-s-aria="lang_label" hidden></div>
     </div>
     <div class="links" id="links"></div>
   </header>

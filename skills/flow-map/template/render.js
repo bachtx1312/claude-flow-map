@@ -1,11 +1,12 @@
 // Draws a flow map from window.FLOW with FlowCore: the state graph (ELK), the inspector, the step view, scenarios, questions, notes and the change log.
-(function () {
-  const flow = window.FLOW;
+// drawFlow(lang) fills the page in one language; I18n.boot at the end calls it again on a clean page when the viewer switches language.
+function drawFlow(lang) {
+  const flow = window.FLOW && I18n.localize(window.FLOW, lang);
   const $ = (id) => document.getElementById(id);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   if (!flow) { $('inspector').append(el('p', 'warn', 'flow.data.js did not load, or it does not set window.FLOW.')); return; }
 
-  const S = FlowCore.strings(flow, window.FLOW_STRINGS);
+  const S = FlowCore.strings(flow, window.FLOW_STRINGS?.[lang]);
   const tr = (k, v) => FlowCore.fmt(S[k] ?? k, v);
   const M = FlowCore.model(flow, S);
   const { byId, nodes, questions, scenarios } = M;
@@ -20,7 +21,8 @@
   const richEl = (tag, cls, s) => { const e = el(tag, cls); e.innerHTML = rich(s); return e; };
   const statusLabel = (s) => S['status_' + s] ?? '';
 
-  document.documentElement.lang = flow.lang ?? 'en';
+  document.documentElement.lang = lang;
+  document.title = flow.title;
   document.querySelectorAll('[data-s]').forEach((e) => { e.textContent = S[e.dataset.s] ?? ''; });
   document.querySelectorAll('[data-s-aria]').forEach((e) => e.setAttribute('aria-label', S[e.dataset.sAria] ?? ''));
   document.querySelectorAll('[data-s-ph]').forEach((e) => e.setAttribute('placeholder', S[e.dataset.sPh] ?? ''));
@@ -725,4 +727,5 @@
   document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && isFull()) setFull(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isFull()) setFull(false); });
   showPage(location.hash === '#changelog' ? 'log' : 'flow');
-})();
+}
+I18n.boot(window.FLOW, drawFlow, 'flow-map:lang');

@@ -5,7 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { DesignCore, loadDesign, loadDesignPack, flowCodes } from '../skills/design-map/template/design.mjs';
+import { DesignCore, loadDesign, loadDesignPack, flowCodes, checkDesign } from '../skills/design-map/template/design.mjs';
+import { I18n } from '../skills/flow-map/template/flow.mjs';
 
 const T = path.join(path.dirname(fileURLToPath(import.meta.url)), '../skills/design-map/template');
 const file = path.join(T, 'design.example.js');
@@ -75,4 +76,13 @@ test('a design data file that holds code instead of JSON is refused, not run', (
   fs.writeFileSync(f, 'window.DESIGN = (() => { globalThis.ran = true; return {}; })();\n');
   assert.throws(() => loadDesign(f), /window\.DESIGN = is not strict JSON/);
   assert.equal(globalThis.ran, undefined);
+});
+
+test('mockups keep the product\'s own words when the page shows another language', () => {
+  const d = example();
+  d.translations = { vi: { 'Refund screens': 'Các màn hình hoàn tiền', 'Send request': 'Gửi yêu cầu' } };
+  const vi = I18n.localize(d, 'vi');
+  assert.equal(vi.title, 'Các màn hình hoàn tiền');
+  assert.deepEqual(vi.screens[1].options[0].html, d.screens[1].options[0].html);
+  assert.ok(checkDesign(d, {}, null).warnings.some((w) => w.includes('"Send request"')), 'a translation of mockup text matches nothing');
 });

@@ -1,11 +1,12 @@
 // Draws a design map from window.DESIGN with DesignCore: screen tabs, option cards, the mockup with question callouts and arrows, the parts table, every question and the change log.
-(function () {
-  const design = window.DESIGN;
+// drawDesign(lang) fills the page in one language; I18n.boot at the end calls it again on a clean page when the viewer switches language.
+function drawDesign(lang) {
+  const design = window.DESIGN && I18n.localize(window.DESIGN, lang);
   const $ = (id) => document.getElementById(id);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   if (!design) { $('screenHead').append(el('p', 'warn', 'design.data.js did not load, or it does not set window.DESIGN.')); return; }
 
-  const S = DesignCore.strings(design, window.DESIGN_STRINGS);
+  const S = DesignCore.strings(design, window.DESIGN_STRINGS?.[lang]);
   const tr = (k, v) => DesignCore.fmt(S[k] ?? k, v);
   const M = DesignCore.model(design, S);
   const { screens, questions } = M;
@@ -19,12 +20,13 @@
   const list = (items) => { const ul = el('ul'); (items ?? []).forEach((t) => ul.append(el('li', null, t))); return ul; };
   const openQ = (id) => questions[id] && !questions[id].decided;
 
-  document.documentElement.lang = design.lang ?? 'en';
+  document.documentElement.lang = lang;
+  document.title = design.title;
   document.querySelectorAll('[data-s]').forEach((e) => { e.textContent = S[e.dataset.s] ?? ''; });
   document.querySelectorAll('[data-s-aria]').forEach((e) => e.setAttribute('aria-label', S[e.dataset.sAria] ?? ''));
 
   // Fonts the mockups use load into the page: @font-face does not work inside a shadow root, but fonts of the page do.
-  (design.fonts ?? []).filter((u) => /^https:\/\/fonts\.googleapis\.com\//.test(u)).forEach((u) => { const l = el('link'); l.rel = 'stylesheet'; l.href = u; document.head.append(l); });
+  (design.fonts ?? []).filter((u) => /^https:\/\/fonts\.googleapis\.com\//.test(u) && !document.querySelector(`link[href="${CSS.escape(u)}"]`)).forEach((u) => { const l = el('link'); l.rel = 'stylesheet'; l.href = u; document.head.append(l); });
 
   function header() {
     const set = (id, text, html) => { const e = $(id); if (!text) { e.hidden = true; return; } if (html) e.innerHTML = rich(text); else e.textContent = text; };
@@ -79,6 +81,7 @@
 
   // Wider mockups shrink to the column; CSS zoom keeps layout and getBoundingClientRect in the zoomed pixels the arrows need.
   function fit() {
+    if (!host.isConnected) return;
     const col = $('mockFrame').parentElement, cs = getComputedStyle(col);
     const room = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     host.style.zoom = String(Math.min(1, room / (cur.s.width ?? 1280)));
@@ -180,7 +183,7 @@
   // Pins on the parts that carry questions; on a wide screen each callout also moves level with its part and an arrow joins them.
   let pins = [];
   function place() {
-    if (!cur || $('screenSec').hidden) return;
+    if (!cur || !host.isConnected || $('screenSec').hidden) return;
     const stage = $('stage'), svg = $('arrows'), notes = $('notes');
     svg.replaceChildren(defs());
     pins.forEach((p) => p.remove());
@@ -394,4 +397,5 @@
   new ResizeObserver(([e]) => { if (e.contentRect.width !== lastW) { lastW = e.contentRect.width; fit(); place(); } }).observe($('stage'));
   document.fonts?.ready.then(place);
   shadow.addEventListener('load', place, true);
-})();
+}
+I18n.boot(window.DESIGN, drawDesign, 'design-map:lang');

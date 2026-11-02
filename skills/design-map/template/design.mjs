@@ -3,11 +3,12 @@
 //   node design.mjs check   <design.data.js>            errors (exit 1) and warnings
 //   node design.mjs summary <design.data.js>            plain-text overview: what is left to choose, open questions by part, what is not built, the last change
 //   node design.mjs build   <design.data.js> <outDir>   check, then write <outDir>/index.html to publish, design.data.js to publish beside it, preview.html to open locally
+//   node design.mjs translations <design.data.js> <lang>  the texts <lang> has no translation for, as JSON to fill in and merge into translations.<lang>
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { FlowCore, loadFlow, loadPack } from '../../flow-map/template/flow.mjs';
+import { FlowCore, I18n, I18N_JS, loadFlow, loadPack, loadPacks, checkLangs, untranslated } from '../../flow-map/template/flow.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (f) => fs.readFileSync(f, 'utf8');
@@ -22,6 +23,9 @@ export { DesignCore };
 // Parsed like flow.data.js, never run.
 export const loadDesign = (file) => loadFlow(file, 'DESIGN');
 export const loadDesignPack = (lang, dataFile) => loadPack(lang, dataFile, here);
+export const loadDesignPacks = (data, dataFile) => loadPacks(data, dataFile, here);
+// The check once per language of the content, like flow-map's.
+export const checkDesign = (design, packs, codes) => checkLangs(design, packs, (d, p) => DesignCore.check(d, p, codes));
 
 // The step codes of the linked flow map, so `step: "N2"` can be checked; null when no flow file is linked.
 export function flowCodes(design, file) {
@@ -39,13 +43,13 @@ function report({ errors, warnings }) {
 }
 
 function build(file, out) {
-  const design = loadDesign(file), pack = loadDesignPack(design?.lang, file);
-  const result = DesignCore.check(design, pack, flowCodes(design, file));
+  const design = loadDesign(file), packs = loadDesignPacks(design, file);
+  const result = checkDesign(design, packs, flowCodes(design, file));
   report(result);
   if (result.errors.length) process.exit(1);
   const noMarkup = (s) => String(s).replace(/[<&"]/g, '');
-  const packJs = pack ? `window.DESIGN_STRINGS = ${JSON.stringify(pack).replace(/</g, '\\u003c')};\n` : '';
-  const scripts = `<script>\n${packJs}${read(path.join(here, 'core.js'))}\n${read(path.join(here, 'render.js'))}\n</script>\n`;
+  const packJs = `window.DESIGN_STRINGS = ${JSON.stringify(packs).replace(/</g, '\\u003c')};\n`;
+  const scripts = `<script>\n${packJs}${read(I18N_JS)}\n${read(path.join(here, 'core.js'))}\n${read(path.join(here, 'render.js'))}\n</script>\n`;
   // Function replacements: the scripts contain "$1", which a replacement string would expand.
   const page = read(path.join(here, 'page.html')).replace('{{TITLE}}', () => noMarkup(design.title)).replace('{{SCRIPTS}}', () => scripts);
   fs.mkdirSync(out, { recursive: true });
@@ -60,14 +64,15 @@ Preview: ${path.join(out, 'preview.html')}`);
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [cmd, file, out] = process.argv.slice(2);
-  if (!file || !['check', 'summary', 'build'].includes(cmd) || (cmd === 'build' && !out)) {
-    console.error('Usage: design.mjs check|summary <design.data.js>  |  design.mjs build <design.data.js> <outDir>');
+  if (!file || !['check', 'summary', 'build', 'translations'].includes(cmd) || (['build', 'translations'].includes(cmd) && !out)) {
+    console.error('Usage: design.mjs check|summary <design.data.js>  |  design.mjs build <design.data.js> <outDir>  |  design.mjs translations <design.data.js> <lang>');
     process.exit(2);
   }
   if (cmd === 'build') build(file, out);
   else {
-    const design = loadDesign(file), pack = loadDesignPack(design?.lang, file), codes = flowCodes(design, file);
-    if (cmd === 'summary') console.log(DesignCore.summary(design, pack, codes));
-    else { const r = DesignCore.check(design, pack, codes); report(r); process.exit(r.errors.length ? 1 : 0); }
+    const design = loadDesign(file), packs = loadDesignPacks(design, file), codes = flowCodes(design, file);
+    if (cmd === 'summary') console.log([DesignCore.summary(design, packs[I18n.langs(design)[0]], codes), ...I18n.gaps(design).map((g) => `  warning: ${g}`)].join('\n'));
+    else if (cmd === 'translations') console.log(untranslated(design, out));
+    else { const r = checkDesign(design, packs, codes); report(r); process.exit(r.errors.length ? 1 : 0); }
   }
 }

@@ -16,7 +16,7 @@ The template sits in this skill's base directory, under `template/`:
 | File | What it is |
 |---|---|
 | `design.example.js` | Two screens of a refund flow that use every field: one screen with two options still to choose, one in code. Copy it to start. |
-| `design.mjs` | The CLI: `check`, `summary`, `build`. It reuses flow-map's loader, so it needs the `flow-map` skill beside it (both ship in this plugin). |
+| `design.mjs` | The CLI: `check`, `summary`, `build`, `translations`. It reuses flow-map's loader and `i18n.js`, so it needs the `flow-map` skill beside it (both ship in this plugin). |
 | `core.js` | Counting, checks and English labels, shared by the page and the CLI. |
 | `render.js`, `page.html` | The page: screen tabs, option cards, the mockup with question callouts and arrows, the parts table, questions, change log. Change the design here, never per design. |
 | `strings/<lang>.json` | Label packs for languages other than English (`vi` ships). |
@@ -34,6 +34,7 @@ Commands, where `T` is the template directory:
 node $T/design.mjs check   docs/designs/<slug>/design.data.js       # errors exit 1; warnings list gaps
 node $T/design.mjs summary docs/designs/<slug>/design.data.js       # what is left to choose, open questions by part, what is not built, last change
 node $T/design.mjs build   docs/designs/<slug>/design.data.js docs/designs/<slug>/.build
+node $T/design.mjs translations docs/designs/<slug>/design.data.js en   # texts en has no translation for, as JSON to fill in
 ```
 
 `build` writes `index.html` (to publish), `design.data.js` (published beside it) and `preview.html` (to open locally), and prints the publish call.
@@ -48,7 +49,8 @@ Fields marked *rich* accept `**bold**`, `` `code` `` and `[label](https://…)`.
 |---|---|
 | `title`, `eyebrow`, `lead` (rich) | The page name (kept stable across republishes), the line above it, the intro |
 | `url` | The artifact link, filled in after the first publish |
-| `lang`, `strings` | The label language and one-off label overrides, as in flow-map |
+| `lang`, `strings` | The language the content is written in (also the label language), and one-off label overrides |
+| `translations` | Optional, to show the content in more languages: `{"<lang>": {"<source text>": "<translation>"}}` (see Languages) |
 | `owner` | Who chooses and answers, shown as "For {owner} to choose" |
 | `asOf` | The date the build status matched the code |
 | `flowMap` | Optional `{url, file}`: the flow map's artifact link, and its `flow.data.js` path relative to this file. With `file`, `check` verifies every screen's `step`. |
@@ -124,6 +126,7 @@ Change the data, add one change-log line for the event, then run `check`, `build
 Rules:
 - Never delete a decided question, a chosen option or a code, and never renumber or reuse a code.
 - Write the change log newest first, one item per event, in the team's language.
+- With `translations`, every text you add or reword needs its translation in the same change: run `translations <lang>` for the list.
 - Before you edit, check whether someone else may have published since your last read. If so, read the published `design.data.js` first and merge your change into it.
 
 ## C. Read a design
@@ -135,7 +138,11 @@ Answer with codes. For example: "M1 is waiting on A or B (A recommended); U1 and
 
 ## Languages
 
-The same as flow-map. Labels are English by default, and `lang: 'vi'` uses the bundled Vietnamese pack. A project pack lives in `docs/designs/strings/<lang>.json` (shared) or in a `strings/` folder beside one design's data file, with keys from `STRINGS` in `core.js`. One-off labels for one design go in `DESIGN.strings`. The content (titles, copy in the mockups, questions) is written in the language the team and the product use.
+The same as flow-map (its SKILL.md, Languages, has the details):
+
+- **Labels:** English by default; `lang: "vi"` uses the bundled Vietnamese pack. A project pack goes in `docs/designs/strings/<lang>.json` (shared) or in a `strings/` folder beside one design's data file, with keys from `STRINGS` in `core.js`. One-off labels for one design go in `DESIGN.strings`.
+- **Content:** written once, in `lang`. To show it in more languages, add `translations: {"<lang>": {"<source text>": "<translation>"}}`. The page then gets a language switch. A question keeps one id and one answer, and only its words are translated. `translations <data> <lang>` lists what is left, and `check` warns about untranslated texts and translations whose source was reworded.
+- **Mockups are never translated.** Their HTML and CSS show the product in its own language. Product screen names (`where`) stay as written too.
 
 ## Rules
 

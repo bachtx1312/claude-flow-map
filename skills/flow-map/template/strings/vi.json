@@ -1,7 +1,7 @@
 {
   "kind_ai": "AI", "kind_code": "CODE", "kind_pause": "CHỜ", "kind_step": "CÂU",
   "status_built": "ĐÃ CÓ", "status_partial": "MỘT PHẦN", "status_planned": "CHƯA CÓ", "status_mock": "GIẢ LẬP",
-  "page_nav": "Trang", "page_flow": "Luồng", "page_log": "Nhật ký thay đổi",
+  "page_nav": "Trang", "page_flow": "Luồng", "page_log": "Nhật ký thay đổi", "lang_label": "Ngôn ngữ",
   "fact_steps": "**{n}** bước: **{built}** đã có, **{partial}** một phần, **{planned}** chưa có, **{mock}** giả lập",
   "fact_scen": "**{n}** kịch bản kiểm",
   "fact_q": "**{d}** / **{n}** câu hỏi đã chốt",
