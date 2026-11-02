@@ -1,6 +1,8 @@
 # flow-map
 
-A Claude Code plugin with one skill, `flow-map`. It keeps a feature's whole flow as a living artifact, which holds:
+A Claude Code plugin with two skills.
+
+`flow-map` keeps a feature's whole flow as a living artifact, which holds:
 
 - a state graph of every step: built, partial, not built or mocked;
 - the open questions, each pinned to the step it decides;
@@ -8,6 +10,15 @@ A Claude Code plugin with one skill, `flow-map`. It keeps a feature's whole flow
 - a change log.
 
 Claude creates the map, updates it after every decision, code change, review or deploy, and reads it back. See [skills/flow-map/SKILL.md](skills/flow-map/SKILL.md) for the workflow and the data shape, and [flow.example.js](skills/flow-map/template/flow.example.js) for a small flow that uses every field.
+
+`design-map` turns a brainstorm into the feature's screens as a living artifact, which holds:
+
+- static mockups of each screen, one per design direction, for the owner to choose from;
+- the open UX questions, each with an arrow to the part of the screen it decides;
+- the build status of every part once the code starts;
+- a change log.
+
+Claude sums up and recommends; the owner chooses and answers by code ("M1 B, U2 agreed"). A screen can name the flow-map step it belongs to. See [skills/design-map/SKILL.md](skills/design-map/SKILL.md) and [design.example.js](skills/design-map/template/design.example.js).
 
 ## Install
 
@@ -29,6 +40,7 @@ To install from a local checkout instead: `/plugin marketplace add ./path/to/flo
 ```sh
 node --test                                                      # behaviour tests, no network
 node skills/flow-map/template/flow.mjs build skills/flow-map/template/flow.example.js /tmp/flow-example
+node skills/design-map/template/design.mjs build skills/design-map/template/design.example.js /tmp/design-example
 ```
 
-Then open `/tmp/flow-example/preview.html`. The page loads ELK from jsDelivr, so it needs a network connection.
+Then open `/tmp/flow-example/preview.html` or `/tmp/design-example/preview.html`. The page loads ELK from jsDelivr, so it needs a network connection.

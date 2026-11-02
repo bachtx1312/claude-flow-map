@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "flow-map",
-      "description": "Living flow maps: state graph, open questions, test scenarios and change log as one artifact.",
+      "description": "Living flow maps: state graph, open questions, test scenarios and change log as one artifact, plus UI designs with mockup options and questions pinned to the screen part they decide.",
       "source": "./",
       "category": "productivity"
     }

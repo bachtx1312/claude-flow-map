@@ -1,0 +1,251 @@
+<title>{{TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: header with fact chips and screen tabs, then the chosen screen: its options as cards, the mockup with question callouts in a gutter on the right
+   (arrows point from each callout at its part), the parts table, then every question. The change log is a second page (#changelog). Tokens match flow-map. */
+:root {
+  --paper: #ffffff;
+  --ink: #1e2350;
+  --text: #22252e;
+  --muted: #5b6070;
+  --line: #e3e5ec;
+  --lane: #f6f7fa;
+  --ok: #1f7a4d;
+  --ok-soft: #e4f5ec;
+  --wait: #a05a00;
+  --wait-soft: #fff3df;
+  --wait-ink: #7a4500;
+  --miss: #b4232c;
+  --miss-soft: #fdecec;
+  --mark: #e0582a;
+  --mock: #2f6db5;
+  --mock-soft: #e8f0fb;
+  --ai: #6b4fd0;
+  --on: #ffffff;
+  --shadow: rgba(30, 35, 80, 0.12);
+  --f-body: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, "Hiragino Sans", "Yu Gothic", "Noto Sans CJK JP", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14161f; --ink: #e2e5ff; --text: #d9dbe4; --muted: #9ba1b5; --line: #2c3042; --lane: #1b1e2b;
+    --ok: #5cc993; --ok-soft: #13301f; --wait: #e8a849; --wait-soft: #33260f; --wait-ink: #f2bf6f; --miss: #ff7d82; --miss-soft: #3b1618;
+    --mark: #ff8d60; --mock: #74abef; --mock-soft: #15263d; --ai: #a996ff; --on: #14161f; --shadow: rgba(0, 0, 0, 0.45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14161f; --ink: #e2e5ff; --text: #d9dbe4; --muted: #9ba1b5; --line: #2c3042; --lane: #1b1e2b;
+  --ok: #5cc993; --ok-soft: #13301f; --wait: #e8a849; --wait-soft: #33260f; --wait-ink: #f2bf6f; --miss: #ff7d82; --miss-soft: #3b1618;
+  --mark: #ff8d60; --mock: #74abef; --mock-soft: #15263d; --ai: #a996ff; --on: #14161f; --shadow: rgba(0, 0, 0, 0.45); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--text); font: 400 15px/1.6 var(--f-body); }
+.wrap { max-width: 1360px; margin: 0 auto; padding-block: 36px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 44px; }
+h1, h2, h3 { color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 36px); line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 21px; line-height: 1.3; font-weight: 700; }
+h3 { font-size: 15px; }
+p { margin: 0; max-width: 72ch; }
+a { color: var(--ink); }
+code { font: 500 12.5px/1 var(--f-mono); color: var(--ink); background: var(--lane); padding: 2px 5px; border-radius: 4px; }
+.eyebrow { font: 500 12px/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mark); }
+header { display: grid; gap: 12px; }
+.lead { color: var(--muted); font-size: 16px; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px; color: var(--muted); }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.fact { display: inline-flex; align-items: baseline; gap: 6px; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: var(--muted); }
+.fact b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+section { display: grid; gap: 16px; min-width: 0; }
+.sub { color: var(--muted); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden; justify-self: start; }
+.seg button { font: inherit; font-size: 13px; padding: 6px 14px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.seg button:focus-visible { outline: 3px solid var(--mark); outline-offset: -3px; }
+.toggle { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; }
+.toggle[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.toggle:focus-visible { outline: 3px solid var(--mark); outline-offset: 2px; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Screen tabs: code, title and whether a design is chosen. */
+.screens { display: flex; flex-wrap: wrap; gap: 8px; }
+.screens button { display: grid; gap: 1px; text-align: left; font: inherit; padding: 8px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--text); cursor: pointer; }
+.screens button[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.screens button:focus-visible { outline: 3px solid var(--mark); outline-offset: 2px; }
+.screens b { font: 600 13px/1.3 var(--f-mono); color: var(--ink); }
+.screens span { font-size: 13px; }
+.screens i { font-style: normal; font-size: 11.5px; color: var(--muted); }
+.screens i.open { color: var(--mark); }
+.screen-head { display: grid; gap: 8px; }
+.screen-head .nm { font: 600 13px/1 var(--f-mono); color: var(--mark); }
+.choice { display: grid; gap: 4px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); border-left: 3px solid var(--mark); font-size: 14px; max-width: 900px; }
+.choice .rec { color: var(--ok); }
+.choice .ask { font-weight: 600; color: var(--ink); }
+.choice.decided { border-left-color: var(--ok); background: var(--ok-soft); color: var(--ok); font-weight: 600; }
+
+/* Option cards double as the switch between options. */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 12px; }
+.opt { display: grid; gap: 6px; align-content: start; font-size: 13.5px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--text); cursor: pointer; }
+.opt:hover { border-color: var(--muted); }
+.opt.on { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.opt.passed { opacity: 0.6; }
+.opt .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; text-align: left; font: inherit; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.opt .top:focus-visible { outline: 3px solid var(--mark); outline-offset: 4px; border-radius: 4px; }
+.opt .letter { font: 600 13px/1 var(--f-mono); color: var(--paper); background: var(--ink); border-radius: 6px; padding: 4px 7px; }
+.opt .name { font-weight: 600; color: var(--ink); font-size: 14.5px; }
+.opt ul { margin: 0; padding-left: 16px; }
+.opt .k { font: 500 10.5px/1 var(--f-mono); letter-spacing: 0.06em; color: var(--muted); margin-top: 4px; }
+.badge { font: 500 9.5px/1 var(--f-mono); letter-spacing: 0.05em; padding: 3px 5px; border-radius: 4px; }
+.badge.rec { background: var(--ok-soft); color: var(--ok); }
+.badge.chosen { background: var(--ok); color: var(--on); }
+
+/* The stage: mockup on the left, callouts on the right, one SVG over both for the arrows. */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 4px; border: 2px solid var(--line); }
+.sw.built { border-color: var(--ok); }
+.sw.partial { border-color: var(--wait); border-style: dashed; }
+.sw.planned { border-color: var(--miss); border-style: dashed; }
+.sw.mock { border-color: var(--mock); border-style: dotted; }
+.legend .pin { position: static; transform: none; }
+.stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 72px; align-items: start; }
+.stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
+.mock-col { min-width: 0; display: grid; justify-items: center; padding: 20px; border-radius: 14px; background: var(--lane); border: 1px solid var(--line); }
+.mock-frame { border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px var(--shadow); max-width: 100%; }
+.notes { position: relative; display: grid; gap: 10px; align-content: start; }
+.notes.placed > .q { position: absolute; left: 0; right: 0; }
+/* Dashed like flow-map's conditional edges: where an arrow crosses the mockup, the design shows through the gaps. */
+.arrow { fill: none; stroke: var(--mark); stroke-width: 1.6; stroke-dasharray: 5 4; opacity: 0.8; transition: opacity 0.15s, stroke-width 0.15s; }
+.arrow.decided { stroke: var(--ok); stroke-dasharray: 2 4; opacity: 0.6; }
+.arrow.on { opacity: 1; stroke-width: 2.2; }
+.mk { fill: var(--mark); }
+.mk.decided { fill: var(--ok); }
+.pin { position: absolute; z-index: 3; transform: translate(-50%, -50%); font: 600 10.5px/1 var(--f-mono); padding: 4px 6px; border-radius: 999px; border: 0; background: var(--mark); color: var(--on); cursor: pointer; box-shadow: 0 0 0 2px var(--paper); white-space: nowrap; }
+.pin.decided { background: var(--ok); }
+.pin:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.elsewhere { font-size: 13px; color: var(--muted); }
+
+.q { border: 1px solid var(--line); border-left: 3px solid var(--mark); border-radius: 0 8px 8px 0; padding: 8px 12px; display: grid; gap: 3px; font-size: 13.5px; min-width: 0; background: var(--paper); transition: box-shadow 0.15s; }
+.q .id { font: 600 12px/1 var(--f-mono); color: var(--mark); }
+.q .at { font: 500 11.5px/1.3 var(--f-mono); color: var(--muted); }
+.q .text { font-weight: 600; color: var(--ink); }
+.q .opts { color: var(--muted); }
+.q .rec { color: var(--ok); }
+.q .dec { color: var(--ok); font-weight: 600; }
+.q.decided { border-left-color: var(--ok); background: var(--ok-soft); }
+.q.decided .id { color: var(--ok); }
+.q.on, .q.flash { box-shadow: 0 0 0 3px var(--mark); }
+.q[tabindex] { cursor: pointer; }
+.q[tabindex]:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 620px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--lane); }
+tbody tr:focus-visible { outline: 3px solid var(--mark); outline-offset: -3px; }
+tr.absent td { color: var(--muted); }
+td .code { font: 600 12.5px/1.4 var(--f-mono); color: var(--ink); }
+.src { font: 500 11.5px/1.45 var(--f-mono); color: var(--muted); word-break: break-word; }
+.st { font: 500 9.5px/1 var(--f-mono); letter-spacing: 0.04em; padding: 3px 5px; border-radius: 4px; white-space: nowrap; }
+.st.partial { background: var(--wait-soft); color: var(--wait); }
+.st.planned { background: var(--miss-soft); color: var(--miss); }
+.st.built { background: var(--ok-soft); color: var(--ok); }
+.st.mock { background: var(--mock-soft); color: var(--mock); }
+
+.qlist { display: grid; gap: 18px; }
+.qgroup { display: grid; gap: 8px; }
+.qgroup-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.qgroup-head button { font: 500 12.5px/1 var(--f-mono); color: var(--ink); background: var(--lane); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+.qgroup-head button:hover { border-color: var(--ink); }
+.qgroup-head button:focus-visible { outline: 3px solid var(--mark); outline-offset: 1px; }
+.qgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 8px; }
+.tag { display: inline-block; font: 500 10.5px/1 var(--f-mono); letter-spacing: 0.04em; padding: 3px 5px; border-radius: 4px; margin-right: 6px; vertical-align: 1px; color: var(--on); }
+.tag.decide { background: var(--ink); }
+.tag.design { background: var(--mark); }
+.tag.code { background: var(--ai); }
+.tag.review { background: var(--mock); }
+.tag.deploy { background: var(--ok); }
+.log { display: grid; gap: 22px; }
+.log-day { display: grid; gap: 8px; }
+.log-day h3 { font: 600 13px/1.3 var(--f-mono); color: var(--muted); }
+.log-day ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.log-day li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.ref { font: 500 11.5px/1 var(--f-mono); padding: 4px 7px; margin: 8px 6px 0 0; border-radius: 4px; border: 1px solid var(--line); background: var(--lane); color: var(--ink); cursor: pointer; }
+.ref:hover { border-color: var(--ink); }
+.ref:focus-visible { outline: 3px solid var(--mark); outline-offset: 1px; }
+.warn { font-size: 13.5px; color: var(--miss); }
+
+/* Narrow: the callouts stack under the mockup; the pins on the mockup carry the codes instead of arrows. */
+@media (max-width: 900px) {
+  .stage { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .stage > svg { display: none; }
+  .mock-col { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .arrow, .q { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1 id="title"></h1>
+    <p class="lead" id="lead"></p>
+    <div class="facts" id="facts"></div>
+    <div class="seg pagenav" role="group" data-s-aria="page_nav">
+      <button type="button" data-page="design" aria-pressed="true" data-s="page_design"></button>
+      <button type="button" data-page="log" aria-pressed="false" data-s="page_log"></button>
+    </div>
+    <div class="links" id="links"></div>
+  </header>
+
+  <section aria-labelledby="screenTitle" id="screenSec">
+    <div class="screens" role="group" id="screenNav" data-s-aria="screens_label"></div>
+    <div class="screen-head" id="screenHead"></div>
+    <div class="options" role="group" id="options" data-s-aria="options_label"></div>
+    <div class="toolbar">
+      <div class="legend" id="legend">
+        <span><i class="pin" aria-hidden="true">U1</i><span data-s="legend_q"></span></span>
+        <span class="st-key" hidden><i class="sw built"></i><span data-s="legend_built"></span></span>
+        <span class="st-key" hidden><i class="sw partial"></i><span data-s="legend_partial"></span></span>
+        <span class="st-key" hidden><i class="sw planned"></i><span data-s="legend_planned"></span></span>
+        <span class="st-key" hidden><i class="sw mock"></i><span data-s="legend_mock"></span></span>
+      </div>
+      <button type="button" class="toggle" id="statusToggle" aria-pressed="false" data-s="status_show"></button>
+    </div>
+    <div class="stage" id="stage">
+      <div class="mock-col"><div class="mock-frame" id="mockFrame" role="img"></div></div>
+      <div class="notes" id="notes" aria-live="polite"></div>
+      <svg id="arrows" aria-hidden="true"></svg>
+    </div>
+    <p class="elsewhere" id="elsewhere" hidden></p>
+    <h3 data-s="parts_title"></h3>
+    <p class="sub" data-s="parts_sub"></p>
+    <div class="table-scroll"><table id="parts"></table></div>
+  </section>
+
+  <section aria-labelledby="questions">
+    <h2 id="questions" data-s="q_title"></h2>
+    <p class="sub" data-s="q_sub"></p>
+    <div class="seg" role="group" id="qFilter" data-s-aria="q_filter">
+      <button type="button" data-f="open" aria-pressed="true" data-s="q_open"></button>
+      <button type="button" data-f="decided" aria-pressed="false" data-s="q_decided"></button>
+      <button type="button" data-f="all" aria-pressed="false" data-s="q_all"></button>
+    </div>
+    <div class="qlist" id="qlist"></div>
+  </section>
+
+  <section aria-labelledby="changelog" id="logPage" hidden>
+    <h2 id="changelog" data-s="log_title"></h2>
+    <p class="lead" data-s="log_lead"></p>
+    <div class="log" id="logList"></div>
+  </section>
+</div>
+
+<script src="design.data.js"></script>
+{{SCRIPTS}}

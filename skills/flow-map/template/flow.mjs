@@ -19,18 +19,19 @@ const { FlowCore } = ctx.window;
 export { FlowCore };
 
 // flow.data.js is parsed, never run: it may come from someone else's artifact. Shape: comment lines, then `window.FLOW =` and strict JSON.
-export function loadFlow(file) {
+// The design-map skill reads its design.data.js (`window.DESIGN =`) the same way.
+export function loadFlow(file, name = 'FLOW') {
   const src = read(file);
-  const m = /window\.FLOW\s*=/.exec(src);
-  if (!m || src.slice(0, m.index).split('\n').some((l) => l.trim() && !l.trim().startsWith('//'))) throw new Error(`${file}: expected only // comment lines, then window.FLOW = {…}`);
+  const m = new RegExp(`window\\.${name}\\s*=`).exec(src);
+  if (!m || src.slice(0, m.index).split('\n').some((l) => l.trim() && !l.trim().startsWith('//'))) throw new Error(`${file}: expected only // comment lines, then window.${name} = {…}`);
   try { return JSON.parse(src.slice(m.index + m[0].length).trim().replace(/;$/, '')); }
-  catch (e) { throw new Error(`${file}: the part after window.FLOW = is not strict JSON (${e.message})`); }
+  catch (e) { throw new Error(`${file}: the part after window.${name} = is not strict JSON (${e.message})`); }
 }
 
-// Labels: the bundled pack, then a project pack in strings/ beside the data file or one folder up; later keys win.
-export function loadPack(lang, dataFile) {
+// Labels: the bundled pack (in `bundled`/strings), then a project pack in strings/ beside the data file or one folder up; later keys win.
+export function loadPack(lang, dataFile, bundled = here) {
   if (!lang || lang === 'en') return null;
-  const dirs = [here, ...(dataFile ? [path.dirname(path.dirname(path.resolve(dataFile))), path.dirname(path.resolve(dataFile))] : [])];
+  const dirs = [bundled, ...(dataFile ? [path.dirname(path.dirname(path.resolve(dataFile))), path.dirname(path.resolve(dataFile))] : [])];
   const packs = dirs.map((d) => path.join(d, 'strings', `${lang}.json`)).filter((f) => fs.existsSync(f)).map((f) => JSON.parse(read(f)));
   return packs.length ? Object.assign({}, ...packs) : null;
 }
